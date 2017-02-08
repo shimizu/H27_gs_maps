@@ -1,0 +1,12 @@
+{
+    "bounds": "122.991443,24.335964,145.759939,45.521723",
+    "json": "{\"vector_layers\": [ { \"id\": \"gs_pointgeojson\", \"description\": \"\", \"minzoom\": 6, \"maxzoom\": 18, \"fields\": {\"P07_001\": \"Number\", \"P07_002\": \"String\"} } ] }",
+    "version": "1",
+    "description": "gs_point.mbtiles",
+    "format": "pbf",
+    "maxzoom": "18",
+    "name": "gs_point.mbtiles",
+    "minzoom": "6",
+    "center": "130.461960,33.625483,18",
+    "type": "overlay"
+}

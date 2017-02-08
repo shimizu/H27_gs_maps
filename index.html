@@ -1,0 +1,119 @@
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css"/>
+<link rel="stylesheet" href="./plugin/leaflet-gps.css"/>
+<title>GS point</title>
+<style>
+html,body {
+    width: 100%;
+    height: 100%;
+    padding: 0px;
+    margin: 0px;
+}
+#map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+}
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet-src.js"></script>
+<script src="./plugin/Leaflet.MapboxVectorTile.js"></script>
+<script src="./plugin/leaflet-hash.js"></script>
+<script src="./plugin/leaflet-gps.js"></script>
+
+<script>
+var map = L.map('map',{
+    maxZoom: 17
+}).setView([36.204824,138.252924], 6) 
+var hash = new L.Hash(map)
+map.addControl( new L.Control.Gps() )
+
+
+
+
+var popup = L.popup();
+var  onGsClick = function(e) {
+    if (!e.feature) return 
+    popup
+        .setLatLng(e.latlng)
+        .setContent(e.feature.properties["P07_002"])
+        .openOn(map);
+}
+
+
+var mvtSource = new L.TileLayer.MVTSource({
+    url: "./tiles/{z}/{x}/{y}.pbf",
+    maxZoom: 20,
+//  debug: true,
+    clickableLayers: ["gs_pointgeojson"],
+    mutexToggle:true,
+    getIDForLayerFeature: function(feature) {
+        return feature.properties["P07_002"];
+    },
+    filter: function(feature, context) {
+        if (feature.layer.name === 'gs_pointgeojson') {
+            return true;
+        }
+    return false;
+    },
+    onClick: onGsClick,
+    style: function (feature) {
+        var style = {};    
+        var type = feature.type;
+        switch (type) {
+            case 1: //'Point'
+                style.color = 'rgba(255,0,0,1)';
+                style.radius = function(){
+                    var z = map.getZoom()
+                    var dotsize = 1.5            
+                    var radius =  dotsize * Math.exp(Math.log(Math.sqrt(z-4)))
+                    return radius
+            
+                };
+            break;
+            case 2: //'LineString'
+                style.color = 'rgba(161,217,155,0.8)';
+                style.size = 3;
+                style.selected = {
+                    color: 'rgba(255,25,0,0.5)',
+                    size: 4
+                };
+            break;
+            case 3: //'Polygon'
+                style.color = fillColor;
+                style.outline = {
+                    color: strokeColor,
+                    size: 1
+                };
+                style.selected = {
+                    color: 'rgba(255,140,0,0.3)',
+                    outline: {
+                        color: 'rgba(255,140,0,1)',
+                        size: 2
+                    }
+                };
+            break;
+        }
+        return style;
+    }
+
+});
+
+
+L.tileLayer('http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 20,
+    id: 'examples.map-i86knfo3'
+}).addTo(map);
+
+map.addLayer(mvtSource);
+</script>
+</body>
+</html>
